@@ -1,0 +1,23 @@
+name: Pull Request Integration
+on:
+  pull_request:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: npm install
+      - name: Run Tests
+        run: npm test
+      - name: Deploy to Production
+        env:
+          PRODUCTION_URL: ${{ secrets.PRODUCTION_URL }}
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "Deploying to Production..."
+            curl -X POST -H 'Content-type: application/json' --data '{"text":"New pull request created. Deploying to production..."}' $PRODUCTION_URL
+          fi
